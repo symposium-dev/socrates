@@ -1,0 +1,8 @@
+{
+  "body": "{\"data\": \"{\\\"content\\\": \\\"@socrates hi!\\\", \\\"sender_email\\\": \\\"user@example.com\\\", \\\"sender_full_name\\\": \\\"John Doe\\\", \\\"subject\\\": \\\"Test\\\", \\\"type\\\": \\\"stream\\\", \\\"stream_id\\\": 123}\", \"trigger\": \"message\", \"token\": \"webhook_token\"}",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "httpMethod": "POST",
+  "path": "/webhook"
+}
