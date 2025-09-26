@@ -1,0 +1,16 @@
+[package]
+name = "socrates"
+version = "0.1.0"
+edition = "2024"
+authors = ["Symposium Dev <dev@symposium.dev>"]
+description = "A Zulip bot that responds with Socrates quotes"
+
+[dependencies]
+tokio = { version = "1.47", features = ["macros", "rt-multi-thread"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.12", features = ["json"] }
+lambda_runtime = "0.14"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+rand = "0.9"
