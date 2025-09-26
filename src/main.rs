@@ -2,7 +2,7 @@ use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tracing::{info, warn};
-use rand::seq::SliceRandom;
+use rand::prelude::*;
 
 #[derive(Debug, Deserialize)]
 struct ZulipWebhook {
@@ -36,16 +36,22 @@ impl Default for ZulipResponse {
     }
 }
 
+/// Represents different types of AWS Lambda events that can trigger this function.
+/// Uses serde(untagged) to automatically deserialize based on which fields are present.
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum LambdaEventType {
+    /// API Gateway event - contains HTTP request data including body as JSON string
     ApiGateway {
+        /// The HTTP request body, typically contains JSON-encoded webhook data as a string
         body: Option<String>,
         #[serde(rename = "httpMethod")]
         http_method: Option<String>,
         path: Option<String>,
     },
+    /// Direct Lambda invocation or other event types
     DirectInvoke {
+        /// Optional message field for direct invocations (not typically used for webhooks)
         message: Option<String>,
     },
 }
@@ -67,7 +73,7 @@ const SOCRATES_QUOTES: &[&str] = &[
 ];
 
 fn get_random_socrates_quote() -> &'static str {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     SOCRATES_QUOTES.choose(&mut rng).unwrap_or(&SOCRATES_QUOTES[0])
 }
 
