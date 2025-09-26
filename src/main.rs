@@ -36,6 +36,20 @@ impl Default for ZulipResponse {
     }
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+enum LambdaEventType {
+    ApiGateway {
+        body: Option<String>,
+        #[serde(rename = "httpMethod")]
+        http_method: Option<String>,
+        path: Option<String>,
+    },
+    DirectInvoke {
+        message: Option<String>,
+    },
+}
+
 /// Collection of famous Socrates quotes
 const SOCRATES_QUOTES: &[&str] = &[
     "All I know is that I know nothing.",
@@ -76,13 +90,15 @@ fn create_response(message: &ZulipMessage) -> ZulipResponse {
     }
 }
 
-async fn function_handler(event: LambdaEvent<Value>) -> Result<Value, Error> {
+async fn function_handler(event: LambdaEvent<LambdaEventType>) -> Result<Value, Error> {
     info!("Received event: {:?}", event.payload);
     
-    // Handle different types of Lambda events (API Gateway, ALB, etc.)
-    let body = match event.payload.get("body") {
-        Some(body) => body.as_str().unwrap_or(""),
-        None => {
+    // Handle different types of Lambda events using the enum
+    let body = match &event.payload {
+        LambdaEventType::ApiGateway { body, .. } => {
+            body.as_deref().unwrap_or("")
+        }
+        LambdaEventType::DirectInvoke { .. } => {
             // Direct invocation or other event types
             return Ok(json!({
                 "statusCode": 200,
